@@ -17,8 +17,8 @@ app.use(express.json());
 
 // Import routes
 const authRoutes = require('./routes/auth');
-const usersRoutes = require('./routes/users');
 const commentsRoutes = require('./routes/comments');
+const usersRoutes = require('./routes/users');
 
 // Security toggle endpoint
 app.get('/api/security-status', async (req, res) => {
@@ -46,17 +46,30 @@ app.put('/api/security-status', async (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', usersRoutes);
 app.use('/api/comments', commentsRoutes);
+app.use('/api/users', usersRoutes);
 
-// Error handler
+// Add a diagnostic endpoint
+app.get('/api/healthcheck', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Enhanced error handler with more details
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  console.error('API Error:', err);
+  res.status(err.status || 500).json({
+    message: err.message || 'Something went wrong!',
+    details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
 });
 
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Access your API at http://localhost:${PORT}`);
 });

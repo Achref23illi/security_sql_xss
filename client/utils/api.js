@@ -1,12 +1,47 @@
 const API_URL = 'http://localhost:5000/api';
 
-// Helper function to handle API responses
+// Improved error handling function
 const handleResponse = async (response) => {
+  // Get content type to determine how to parse the response
+  const contentType = response.headers.get('content-type') || '';
+  
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || 'Network response was not ok');
+    try {
+      // Try to parse as JSON
+      if (contentType.includes('application/json')) {
+        const errorData = await response.json();
+        console.error('API Error Details:', errorData);
+        throw new Error(errorData.message || 'API request failed');
+      } else {
+        // Handle text responses
+        const textError = await response.text();
+        console.error('API Error (text):', textError);
+        throw new Error('Network response was not ok');
+      }
+    } catch (e) {
+      // Handle parsing errors or throw the original error
+      if (e.name !== 'SyntaxError') {
+        throw e;
+      }
+      console.error('Error parsing error response');
+      throw new Error(`Request failed with status: ${response.status}`);
+    }
   }
-  return response.json();
+  
+  // Handle successful responses
+  try {
+    // For empty responses or non-JSON types
+    if (contentType.includes('application/json')) {
+      return await response.json();
+    } else if (response.status === 204) {
+      return null; // No content
+    } else {
+      return await response.text();
+    }
+  } catch (error) {
+    console.error('Error parsing successful response:', error);
+    throw new Error('Error parsing response data');
+  }
 };
 
 // API client object
@@ -63,12 +98,18 @@ const api = {
     },
     
     addComment: async (commentData) => {
-      const response = await fetch(`${API_URL}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(commentData),
-      });
-      return handleResponse(response);
+      console.log('Sending comment data:', commentData);
+      try {
+        const response = await fetch(`${API_URL}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(commentData),
+        });
+        return handleResponse(response);
+      } catch (error) {
+        console.error('Error in addComment:', error);
+        throw error;
+      }
     },
   },
   

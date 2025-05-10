@@ -233,12 +233,29 @@ export default function PostDetail() {
 }
 
 function CommentCard({ comment }) {
+  // Add state to track security mode
+  const [isSecured, setIsSecured] = useState(false);
+  
+  // Fetch security status when component mounts
+  useEffect(() => {
+    const fetchSecurityStatus = async () => {
+      try {
+        const response = await api.security.getStatus();
+        setIsSecured(response.isSecured);
+      } catch (error) {
+        console.error('Error fetching security status:', error);
+      }
+    };
+    
+    fetchSecurityStatus();
+  }, []);
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5">
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center">
           <div className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full w-8 h-8 flex items-center justify-center mr-3">
-            {comment.username.charAt(0).toUpperCase()}
+            {comment.username?.charAt(0).toUpperCase() || '?'}
           </div>
           <div>
             <span className="font-medium text-gray-800 dark:text-white">{comment.username}</span>
@@ -248,11 +265,26 @@ function CommentCard({ comment }) {
           </div>
         </div>
       </div>
-      {/* Important: This is where XSS can happen in unsecured mode */}
-      <div
-        dangerouslySetInnerHTML={{ __html: comment.content }}
-        className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 overflow-hidden"
-      />
+      {/* Conditional rendering based on security mode */}
+      {isSecured ? (
+        // Secure mode: Render text safely without dangerouslySetInnerHTML
+        <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 overflow-hidden">
+          {comment.content}
+        </div>
+      ) : (
+        // Insecure mode: Keep dangerouslySetInnerHTML for demonstration
+        <div
+          dangerouslySetInnerHTML={{ __html: comment.content }}
+          className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 overflow-hidden"
+        />
+      )}
+      
+      {/* Add a warning for unsecured mode */}
+      {!isSecured && (
+        <div className="mt-3 text-xs p-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded border border-yellow-200 dark:border-yellow-800">
+          <span className="font-semibold">XSS Demo:</span> This comment is rendered unsafely in insecure mode.
+        </div>
+      )}
     </div>
   );
 }

@@ -55,44 +55,6 @@ export default function Home() {
           />
         </div>
         
-        <div className="mt-16 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
-          <h2 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-white">How to Use This Demo</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <InstructionCard 
-              number="1"
-              title="Toggle Security Mode"
-              description="Use the security toggle to switch between secured and unsecured versions of the application."
-            />
-            
-            <InstructionCard 
-              number="2"
-              title="Try the Attacks"
-              description="In unsecured mode, test SQL injection in the login form and XSS attacks in the forum."
-            />
-            
-            <InstructionCard 
-              number="3"
-              title="See the Protection"
-              description="Switch to secured mode to see how proper security measures prevent these attacks."
-            />
-          </div>
-          
-          <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-            <div className="flex items-start">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h3 className="font-bold text-blue-800 dark:text-blue-300">Educational Purpose Only</h3>
-                <p className="text-sm text-blue-700 dark:text-blue-400">
-                  This application is designed for educational purposes to demonstrate web security vulnerabilities. 
-                  Never attempt these techniques on real websites without permission.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
         
         <div className="mt-12 text-center">
           <Link href="/register">

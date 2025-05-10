@@ -24,6 +24,8 @@ export default function Login() {
     setIsLoading(true);
 
     try {
+      console.log('Logging in with:', credentials.username);
+      
       const response = await api.auth.login(credentials);
       setSuccess('Login successful!');
       
@@ -36,7 +38,18 @@ export default function Login() {
         router.push('/profile');
       }, 1500);
     } catch (error) {
-      setError(error.message || 'Failed to login');
+      console.error('Login failed:', error);
+      
+      // Enhanced error display
+      if (error.message === 'Invalid credentials') {
+        if (!credentials.password) {
+          setError('Please enter a password');
+        } else {
+          setError('Invalid username or password');
+        }
+      } else {
+        setError(error.message || 'Failed to login. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
