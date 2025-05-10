@@ -1,4 +1,5 @@
 {
+  "$schema": "./local-package-schema.json",
   "name": "database-security-project",
   "version": "1.0.0",
   "description": "Database security demo with Next.js and Express",
