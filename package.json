@@ -8,7 +8,8 @@
     "server": "cd server && node server.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-all": "npm install && cd client && npm install && cd ../server && npm install",
-    "setup-db": "cd server && node setup-db.js"
+    "setup-db": "cd server && node setup-db.js",
+    "dev-webpack": "NEXT_WEBPACK=1 next dev"
   },
   "keywords": [
     "security",

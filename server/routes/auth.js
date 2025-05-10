@@ -75,15 +75,20 @@ router.post('/login', async (req, res) => {
     } else {
       // Insecure version - SQL Injection vulnerability
       // WARNING: This is intentionally vulnerable for demonstration
-      const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
+      // Remove single quotes around username to allow classic injection payloads
+      const query = `SELECT * FROM users WHERE username = ${username} AND password = '${password}'`;
       
-      const [users] = await db.query(query);
-      
-      if (users.length === 0) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+      try {
+        const [users] = await db.query(query);
+        if (users.length === 0) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+        user = users[0];
+      } catch (sqlError) {
+        // Log SQL error for debugging
+        console.error('SQL error during insecure login:', sqlError);
+        return res.status(500).json({ message: 'SQL error during login (check your SQL syntax or injection payload)' });
       }
-      
-      user = users[0];
     }
     
     // Generate JWT token
